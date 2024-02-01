@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background-color: #212121;
+      color: #fafafa;
+      margin: 0;
+      padding: 20px;
+    }
+
+    #system-info, #battery-info {
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      color: #4CAF50;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    strong {
+      color: #4db5e8;
+    }
+
+    span {
+      color: #9dc5d3;
+    }
+
+    .charging-icon {
+      fill: #4db5e8;
+      margin-left: 5px;
+    }
+
+    #connection-info::before,
+    #cpu-info::before,
+    #memory-info::before {
+      content: '$';
+      color: #4CAF50;
+       margin-right: 5px;
+    }
+  </style>
+  <title>Device Info</title>
+</head>
+<body>
+  <div id="system-info">
+    <h2>System Information:</h2>
+    <p><strong>Operating System:</strong> <span id="os-info"></span></p>
+    <p><strong>Browser:</strong> <span id="browser-info"></span></p>
+    <p><strong>Screen Resolution:</strong> <span id="resolution-info"></span></p>
+    <p><strong>User Language:</strong> <span id="language"></span></p>
+    <p><strong>Connection:</strong> <span id="connection-info"></span></p>
+    <p><strong>CPU Cores:</strong> <span id="cpu-info"></span></p>
+    <p><strong>Device Memory:</strong> <span id="memory-info"></span></p>
+  </div>
+
+  <div id="battery-info">
+    <h2>Battery Information:</h2>
+    <p><strong>Battery Level:</strong> <span id="battery-level"></span>%</p>
+    <p><strong>Charging Status:</strong> <span id="charging-status"></span></p>
+    <p><strong>Battery Type:</strong> <span id="battery-type"></span></p>
+    <p><strong>Charging Time:</strong> <span id="charging-time"></span></p>
+  </div>
+
+  <script>
+    // System Information
+    document.getElementById('os-info').innerText = navigator.platform;
+    document.getElementById('browser-info').innerText = navigator.userAgent;
+    document.getElementById('resolution-info').innerText = `${window.screen.width} x ${window.screen.height}`;
+    document.getElementById('language').innerText = navigator.language;
+
+    // Connection Information
+    document.getElementById('connection-info').innerText = navigator.onLine ? 'Online' : 'Offline';
+
+    // CPU Information
+    document.getElementById('cpu-info').innerText = navigator.hardwareConcurrency || 'Not available';
+
+    // Memory Information
+    document.getElementById('memory-info').innerText = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : 'Not available';
+
+    // Battery Information
+    function updateBatteryInfo(battery) {
+      document.getElementById('battery-level').innerText = (battery.level * 100).toFixed(2);
+      document.getElementById('charging-status').innerText = battery.charging ? 'Charging' : 'Not Charging';
+      document.getElementById('battery-type').innerText = battery.charging ? 'AC' : 'Battery';
+      document.getElementById('charging-time').innerText = battery.chargingTime === Infinity ? 'N/A' : battery.chargingTime + ' seconds';
+    }
+
+    if (navigator.getBattery) {
+      navigator.getBattery().then(function (battery) {
+        updateBatteryInfo(battery);
+
+        battery.addEventListener('levelchange', function () {
+          updateBatteryInfo(battery);
+        });
+
+        battery.addEventListener('chargingchange', function () {
+          updateBatteryInfo(battery);
+        });
+      });
+    } else {
+      document.getElementById('battery-info').innerHTML = '<p>Battery information not supported in this browser.</p>';
+    }
+  </script>
+</body>
+</html>
